@@ -1,4 +1,4 @@
-<!doctype html>
+a<!doctype html>
 <html lang="vi">
 <head>
 <meta charset="utf-8">
@@ -11,38 +11,783 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Be+Vietnam+Pro:wght@200;300;400;500&display=swap" rel="stylesheet">
+
+<!-- ===================================================================
+     KHU VỰC DUY NHẤT BẠN CẦN SỬA
+     Chỉ thay phần chữ nằm giữa hai dấu nháy " ". Đừng xoá dấu phẩy
+     ở cuối dòng. Sửa xong thì lưu file lại là trang tự cập nhật.
+     =================================================================== -->
 <script>
 const CONFIG = {
+
+  // Tên người tốt nghiệp, hiện thật lớn ở đầu tranga
   ten: "Trương Thế Bách",
+
+  // Thời điểm bắt đầu lễ. Viết theo đúng dạng NĂM-THÁNG-NGÀYTHỜI:PHÚT:00+07:00
   batDau: "2026-11-15T08:00:00+07:00",
+
+  // Lễ kéo dài khoảng bao nhiêu giờ (dùng để tạo lời mời trong lịch)
   soGio: 3,
+
+  // Đếm ngược có hiện cả số giây hay không. Viết false nếu muốn bỏ giây đi
   hienGiay: true,
+
+  // Dòng ngày giờ hiện trên thiệp
   ngayGioChu: "08:00, Thứ Bảy ngày 15 tháng 11 năm 2026",
+
+  // Ngành / trường (để trống "" nếu không muốn hiện)
   nganh: "",
   truong: "",
+
+  // Địa điểm
   diaDiem: "Cập nhật địa điểm tại đây",
   diaChi: "",
+
+  // Đường dẫn Google Maps. Để trống "" thì trang tự tìm theo địa chỉ ở trên
   linkBanDo: "",
+
+  // Gợi ý trang phục. Để trống "" nếu không muốn hiện
   trangPhuc: "",
+
+  // Lời nhắn ngắn của chủ nhân thiệp
   loiNhan: "Hành trình đại học đã khép lại một chương. Em vô cùng biết ơn thầy cô, gia đình và những người bạn đã đồng hành. Sự hiện diện của mọi người trong buổi lễ tốt nghiệp là món quà ý nghĩa nhất. Rất mong được đón tiếp mọi người!",
+
+  // Ảnh trong khung. Đặt file cạnh index.html rồi ghi tên, ví dụ "anh.jpg".
+  // Để trống "" thì hiện chữ lồng tên T T B
   anh: "nen1.png",
+
+  // "bo-goc" | "oval" | "tron" | "vom"
   kieuKhung: "bo-goc",
+
+  // Ảnh nền đổi khi cuộn. Để [] nếu không dùng
   anhNen: ["nen1.png", "nen2.png", "nen3.png", "nen4.png"],
+
   doMoAnhNen: 0.45,
   viTriAnhNen: "center",
+
+  // Chương trình trong ngày
   chuongTrinh: [],
+
   tuaXacNhan: "Bạn sẽ có mặt chứ?",
-  nhanTraLoi: ["Chắc chắn sẽ đến", "Gửi lời chúc từ xa"],
-  ghiChuTraLoi: ["", ""],
-  loiCamOnXacNhan: ["Hẹn gặp lại vào hôm đó nhé!", "Cảm ơn lời chúc chân thành. Hẹn gặp mọi người vào một dịp khác!"],
+
+  nhanTraLoi: [
+    "Chắc chắn sẽ đến",
+    "Gửi lời chúc từ xa"
+  ],
+
+  ghiChuTraLoi: [
+    "",
+    ""
+  ],
+
+  loiCamOnXacNhan: [
+    "Hẹn gặp lại vào hôm đó nhé!",
+    "Cảm ơn lời chúc chân thành. Hẹn gặp mọi người vào một dịp khác!"
+  ],
+
   oKhongDen: 2,
   hienLoiChuc: "khong-den",
+
   nhanLoiChuc: "Lời chúc gửi tới Bách",
   goiYLoiChuc: "Viết đôi dòng chúc mừng nhé, Bách sẽ đọc hết ạ",
+
+  // Dán URL /exec của Apps Script sau khi deploy (xem HUONG_DAN.md)
   linkNhanXacNhan: "https://script.google.com/macros/s/AKfycbwx7Lmz6du4x19neB_Nn5KPaFwkqb2lA18G3tk-miYRbtMDZqaAfMsZ0R2lPJUK6Pc6/exec",
+
   linkXacNhan: "",
+
   soDienThoai: "0372362558",
+
   hanXacNhan: "",
+
   loiCam: "Sự hiện diện của anh chị và các bạn sẽ là món quà ý nghĩa nhất."
 };
 </script>
+<!-- ============ HẾT PHẦN CẦN SỬA. Phía dưới là phần kỹ thuật ============ -->
+
+<style>
+/* ===================================================================
+   BẢNG MÀU. Đổi sáu dòng dưới đây là cả trang đổi màu theo.
+   Mỗi màu viết hai lần, một lần dạng mã #, một lần dạng ba số
+   đỏ lá dương, vì trang cần cả hai để pha ra các sắc mờ.
+   Muốn đổi màu tự chọn thì tra mã # ở google "color picker",
+   rồi tra luôn dạng rgb của chính mã đó để điền cho khớp.
+
+   Ba bảng đã pha sẵn, muốn dùng thì thay đúng sáu dòng bên dưới:
+
+   Đỏ mận:   #2A0E16 / 42,14,22   #F6EDE2 / 246,237,226   #D8B26A / 216,178,106
+   Xanh lá:  #0E211C / 14,33,28   #EFEAD9 / 239,234,217   #C9A24B / 201,162,75
+   Giấy kem: #F4EFE6 / 244,239,230   #26211C / 38,33,28   #9A6B1F / 154,107,31
+   =================================================================== */
+:root{
+  /* màu nền của trang */
+  --muc-sau:#F5ECE3;
+  --rgb-nen:245,236,227;
+
+  /* màu chữ */
+  --giay:#1A1A1A;
+  --rgb-chu:26,26,26;
+
+  /* màu nhấn, dùng cho tên khách, số đếm ngược, đường kẻ và nút chính */
+  --dong:#8C6239;
+  --rgb-dong:140,98,57;
+
+  /* các sắc mờ tự pha từ ba màu trên, không cần sửa */
+  --giay-mo:rgba(var(--rgb-chu),.62);
+  --dong-mo:rgba(var(--rgb-dong),.34);
+  --w:34rem;
+}
+*{box-sizing:border-box}
+
+/* ===================================================================
+   CỠ CHỮ TOÀN TRANG. Đổi đúng một con số dưới đây là mọi chữ trong
+   trang to nhỏ theo, mà bố cục không bị lệch.
+   1 là cỡ gốc, 1.1 là to hơn 10 phần trăm, 1.2 là to rõ rệt,
+   0.95 là nhỏ lại một chút. Nên giữ trong khoảng 0.9 đến 1.3.
+   =================================================================== */
+:root{ --co-chu:1.1 }
+html{
+  font-size:calc(100% * var(--co-chu));
+  -webkit-text-size-adjust:100%;
+}
+body{
+  margin:0;
+  background:var(--muc-sau);
+  background-image:
+    radial-gradient(120% 60% at 50% 0%, rgba(var(--rgb-chu),.07) 0%, rgba(var(--rgb-chu),0) 62%),
+    radial-gradient(90% 50% at 50% 100%, rgba(var(--rgb-chu),.05) 0%, rgba(var(--rgb-chu),0) 60%);
+  color:var(--giay);
+  font-family:"Be Vietnam Pro",system-ui,sans-serif;
+  font-weight:300;
+  font-size:1rem;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.trang{max-width:var(--w);margin:0 auto;padding:0 1.5rem}
+.lop{padding-block:3.25rem;position:relative}
+.lop + .lop::before{
+  content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:6.5rem;height:1px;background:var(--dong-mo);
+}
+h1,h2,h3{font-family:"Playfair Display",Georgia,serif;font-weight:400;margin:0}
+p{margin:0 0 1rem}
+p:last-child{margin-bottom:0}
+
+/* đầu trang */
+.mo-dau{text-align:center;padding-top:3.5rem}
+.tua{
+  display:block;font-size:.875rem;letter-spacing:.14em;
+  color:var(--giay-mo);margin-bottom:.35rem;
+}
+.khach{
+  font-family:"Playfair Display",serif;font-style:italic;
+  font-size:1.375rem;color:var(--dong);margin-bottom:2.25rem;
+}
+.dip{font-size:1rem;letter-spacing:.2em;color:var(--giay-mo)}
+.ten{
+  font-size:clamp(2.6rem,calc(13vw * var(--co-chu)),4.4rem);line-height:1.02;
+  margin:.6rem 0 .9rem;letter-spacing:-.01em;
+}
+.hoc{font-size:1rem;color:var(--giay-mo);line-height:1.5}
+.hoc span{display:block}
+.ngay-phu{margin-top:.55rem;font-size:1rem;line-height:1.6;color:var(--giay-mo)}
+.ngay-phu span{display:block}
+.hien:nth-child(6){animation-delay:.6s}
+.ngay{
+  margin-top:1.75rem;font-family:"Playfair Display",serif;
+  font-size:1.125rem;color:var(--giay);
+}
+.tua-dua{display:block;margin:0 auto 1.75rem;width:26px;height:54px;overflow:visible}
+.tua-dua path,.tua-dua circle{stroke:var(--dong)}
+
+/* ảnh */
+.khung{
+  width:min(17rem,72%);margin:0 auto 1.9rem;aspect-ratio:4/5;
+  border:1px solid var(--dong-mo);border-radius:14px;
+  overflow:hidden;background:rgba(var(--rgb-chu),.04);position:relative;
+}
+.khung.k-vom{border-radius:999px 999px 8px 8px}
+.khung.k-oval{border-radius:50%}
+.khung.k-tron{aspect-ratio:1;border-radius:50%;width:min(15rem,66%)}
+.khung img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* khi chưa có ảnh: chữ lồng tên trong vòng tròn mảnh, không có khung đặc */
+.dau-ten{
+  width:8.5rem;height:8.5rem;margin:.5rem auto 2rem;
+  border:1px solid var(--dong-mo);border-radius:50%;
+  display:grid;place-items:center;
+}
+.dau-ten span{
+  font-family:"Playfair Display",serif;font-size:1.75rem;
+  letter-spacing:.22em;text-indent:.22em;color:var(--dong);
+}
+.nhan{text-align:center;color:var(--giay-mo);font-size:1.125rem;line-height:1.8}
+
+/* đếm ngược */
+.dem{display:flex;justify-content:center;gap:clamp(.85rem,5vw,1.75rem);text-align:center}
+.dem div{min-width:2.75rem}
+.dem b{
+  display:block;font-family:"Playfair Display",serif;font-weight:400;
+  font-size:clamp(1.6rem,calc(7.2vw * var(--co-chu)),2.1rem);line-height:1;color:var(--dong);
+  font-variant-numeric:tabular-nums;
+}
+.dem small{font-size:.8125rem;letter-spacing:.1em;color:var(--giay-mo)}
+.dem-xong{text-align:center;font-family:"Playfair Display",serif;font-size:1.25rem;color:var(--dong)}
+
+/* thông tin */
+.hang{
+  display:grid;grid-template-columns:6rem 1fr;gap:.35rem 1rem;
+  padding:.95rem 0;border-top:1px solid rgba(var(--rgb-chu),.14);
+}
+.hang:last-of-type{border-bottom:1px solid rgba(var(--rgb-chu),.14)}
+.hang dt{font-size:.9375rem;color:var(--giay-mo);padding-top:.15rem}
+.hang dd{margin:0;font-size:1.125rem}
+.hang dd em{display:block;font-style:normal;font-size:1rem;color:var(--giay-mo)}
+dl{margin:0}
+.nut-doi{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}
+.nut-doi a{flex:1 1 9rem}
+
+/* chương trình */
+.tieu-de{
+  font-size:1.5rem;text-align:center;margin-bottom:1.6rem;
+}
+.muc{display:grid;grid-template-columns:3.75rem 1fr;gap:1rem;padding:.55rem 0}
+.muc b{
+  font-family:"Playfair Display",serif;font-weight:400;color:var(--dong);
+  font-variant-numeric:tabular-nums;
+}
+
+/* nút */
+.nut{
+  display:block;text-align:center;text-decoration:none;
+  padding:.85rem 1.4rem;border:1px solid var(--dong-mo);
+  color:var(--giay);font-size:1rem;letter-spacing:.03em;
+  background:transparent;transition:background .25s,border-color .25s;
+}
+.nut:hover,.nut:focus-visible{background:rgba(var(--rgb-dong),.12);border-color:var(--dong)}
+.nut.chinh{background:var(--dong);border-color:var(--dong);color:var(--muc-sau);font-weight:500}
+.nut.chinh:hover,.nut.chinh:focus-visible{filter:brightness(1.1)}
+:focus-visible{outline:2px solid var(--dong);outline-offset:3px}
+
+.xac-nhan{text-align:center}
+.xac-nhan .nut{max-width:19rem;margin:0 auto;width:100%}
+.nut[disabled]{opacity:.55;cursor:default}
+
+/* phiếu xác nhận ngay trên trang */
+.nhan-o{
+  display:block;font-size:.9375rem;letter-spacing:.06em;
+  color:var(--giay-mo);margin-bottom:.45rem;
+}
+.o-ten{
+  display:block;width:100%;max-width:19rem;margin:0 auto 1.75rem;
+  padding:.55rem .3rem;text-align:center;
+  background:transparent;border:0;border-bottom:1px solid var(--dong-mo);
+  border-radius:0;color:var(--giay);font-family:inherit;font-size:1.125rem;
+  transition:border-color .2s;
+}
+.o-ten:focus{outline:0;border-bottom-color:var(--dong)}
+.o-ten::placeholder{color:rgba(var(--rgb-chu),.35)}
+.chon{
+  display:flex;flex-direction:column;gap:.6rem;
+  max-width:19rem;margin:0 auto 1.25rem;
+}
+.chon button{
+  width:100%;padding:.75rem .8rem;cursor:pointer;
+  background:transparent;border:1px solid var(--dong-mo);color:var(--giay);
+  font-family:inherit;font-size:.9375rem;line-height:1.4;
+  transition:background .2s,border-color .2s,color .2s;
+}
+.chon button:hover{border-color:var(--dong)}
+.chon button[aria-pressed="true"]{
+  background:rgba(var(--rgb-dong),.14);border-color:var(--dong);color:var(--dong);
+}
+.khoi-chuc{max-width:22rem;margin:0 auto 1.6rem;animation:vao .5s ease}
+.khoi-chuc .nhan-o{text-align:center}
+.o-chuc{
+  display:block;width:100%;padding:.7rem .85rem;
+  background:transparent;border:1px solid var(--dong-mo);border-radius:2px;
+  color:var(--giay);font-family:inherit;font-size:1.0625rem;line-height:1.6;
+  resize:vertical;min-height:5.5rem;transition:border-color .2s;
+}
+.o-chuc:focus{outline:0;border-color:var(--dong)}
+.o-chuc::placeholder{color:rgba(var(--rgb-chu),.35)}
+.ghi-chu-chon{
+  max-width:19rem;margin:0 auto 1.5rem;
+  font-size:.9375rem;line-height:1.6;color:var(--dong);
+  animation:vao .4s ease;
+}
+.loi{min-height:1.4rem;margin:.9rem 0 0;font-size:.9375rem;color:var(--dong)}
+.xong{
+  font-family:"Playfair Display",serif;font-size:1.3125rem;line-height:1.6;
+  color:var(--dong);margin:0;
+}
+.han{margin-top:.9rem;font-size:.9375rem;color:var(--giay-mo)}
+.han a{color:var(--dong)}
+
+footer{
+  text-align:center;padding:2.75rem 1.5rem 3.5rem;
+  color:var(--giay-mo);font-size:1rem;
+}
+footer .ky{
+  font-family:"Playfair Display",serif;font-style:italic;
+  font-size:1.25rem;color:var(--dong);margin-top:.75rem;
+}
+.an{display:none}
+
+/* lớp ảnh nền đổi theo cuộn */
+#nen{position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden}
+#nen img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:var(--vi-tri-nen,center);
+  opacity:0;transform:scale(1.04);
+  transition:opacity 1.3s ease;
+}
+#nen img.dang-hien{opacity:var(--do-mo-nen,.42)}
+#nen .man{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,
+    rgba(var(--rgb-nen),.86) 0%,
+    rgba(var(--rgb-nen),.58) 30%,
+    rgba(var(--rgb-nen),.58) 70%,
+    rgba(var(--rgb-nen),.9) 100%);
+}
+
+/* vạch nhỏ mời cuộn xuống, tự mờ đi khi bắt đầu cuộn */
+.cuon{
+  display:block;margin:2.75rem auto 0;width:1px;height:3.25rem;
+  background:linear-gradient(to bottom,var(--dong),rgba(var(--rgb-dong),0));
+  transition:opacity .5s ease;
+}
+.cuon.tat{opacity:0}
+
+/* một lần hiện ra khi mở trang */
+.hien{opacity:0;transform:translateY(10px);animation:vao .9s ease forwards}
+.hien:nth-child(2){animation-delay:.12s}
+.hien:nth-child(3){animation-delay:.24s}
+.hien:nth-child(4){animation-delay:.36s}
+.hien:nth-child(5){animation-delay:.48s}
+@keyframes vao{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .hien{animation:none;opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<main class="trang">
+
+  <header class="lop mo-dau">
+    <svg class="tua-dua hien" viewBox="0 0 26 54" aria-hidden="true" fill="none">
+      <path d="M13 0v26" stroke="#C69B54" stroke-width="1"/>
+      <circle cx="13" cy="29" r="3" stroke="#C69B54" stroke-width="1"/>
+      <path d="M13 32v9M9 33l-2 8M17 33l2 8" stroke="#C69B54" stroke-width="1" stroke-linecap="round"/>
+    </svg>
+    <div class="hien">
+      <span class="tua">Trân trọng kính mời</span>
+      <div class="khach" id="khach"></div>
+    </div>
+    <div class="hien">
+      <span class="dip">Đến dự lễ tốt nghiệp của</span>
+      <h1 class="ten" id="ten"></h1>
+      <div class="hoc"><span id="nganh"></span><span id="truong"></span></div>
+    </div>
+    <div class="ngay hien" id="ngayGio"></div>
+    <div class="ngay-phu hien">
+      <span id="dongPhu1"></span>
+      <span id="dongPhu2"></span>
+    </div>
+    <span class="cuon hien" id="cuon" aria-hidden="true"></span>
+  </header>
+
+  <section class="lop">
+    <div class="khung" id="khung"></div>
+    <div class="nhan" id="loiNhan"></div>
+  </section>
+
+  <section class="lop" id="lopDem" aria-live="off">
+    <div class="dem" id="dem"></div>
+  </section>
+
+  <section class="lop">
+    <dl>
+      <div class="hang"><dt>Thời gian</dt><dd id="tgChiTiet"></dd></div>
+      <div class="hang"><dt>Địa điểm</dt><dd id="noiChiTiet"></dd></div>
+      <div class="hang" id="hangTrangPhuc"><dt>Trang phục</dt><dd id="trangPhuc"></dd></div>
+    </dl>
+    <div class="nut-doi">
+      <a class="nut" id="nutBanDo" href="#" target="_blank" rel="noopener">Xem đường đi</a>
+      <a class="nut" id="nutLich" href="#" target="_blank" rel="noopener">Lưu vào lịch</a>
+    </div>
+  </section>
+
+  <section class="lop" id="lopChuongTrinh">
+    <h2 class="tieu-de">Chương trình</h2>
+    <div id="chuongTrinh"></div>
+  </section>
+
+  <section class="lop xac-nhan" id="lopXacNhan">
+    <h2 class="tieu-de" id="tuaXacNhan"></h2>
+    <div id="phieu">
+      <label class="nhan-o" for="oTen">Tên của anh chị và các bạn</label>
+      <input class="o-ten" id="oTen" type="text" autocomplete="name" placeholder="">
+      <div class="chon" id="chon"></div>
+      <p class="ghi-chu-chon an" id="ghiChuChon"></p>
+      <div class="khoi-chuc an" id="khoiChuc">
+        <label class="nhan-o" for="oChuc" id="nhanChuc"></label>
+        <textarea class="o-chuc" id="oChuc" rows="4"></textarea>
+      </div>
+      <button class="nut chinh" id="nutGui" type="button">Gửi lời xác nhận</button>
+      <p class="loi" id="loi" role="status"></p>
+    </div>
+    <a class="nut chinh an" id="nutXacNhan" href="#" target="_blank" rel="noopener">Mở phiếu xác nhận</a>
+    <p class="han" id="han"></p>
+  </section>
+
+</main>
+
+<footer>
+  <p id="loiCam"></p>
+  <div class="ky" id="kyTen"></div>
+</footer>
+
+<script>
+(function(){
+  const C = CONFIG;
+  const dat = (id, chu) => {
+    const e = document.getElementById(id);
+    if (!e) return;
+    if (chu === undefined || chu === null || String(chu).trim() === "") {
+      e.classList.add("an");
+      return;
+    }
+    e.textContent = chu;
+  };
+
+  // tên khách mời lấy từ đường dẫn, ví dụ ...?ten=Cô%20Lan
+  const tham = new URLSearchParams(location.search);
+  const khach = (tham.get("ten") || tham.get("khach") || "").trim();
+  dat("khach", khach ? khach : "Anh chị và các bạn");
+
+  dat("ten", C.ten);
+  dat("nganh", C.nganh);
+  dat("truong", C.truong);
+  dat("ngayGio", C.ngayGioChu);
+  dat("dongPhu1", C.diaDiem);
+  dat("dongPhu2", C.diaChi);
+  dat("loiNhan", C.loiNhan);
+  dat("tgChiTiet", C.ngayGioChu);
+  dat("loiCam", C.loiCam);
+  dat("kyTen", C.ten);
+  document.title = "Thiệp mời lễ tốt nghiệp của " + C.ten;
+
+  // ảnh hoặc chữ lồng tên
+  const khung = document.getElementById("khung");
+  const chuLong = C.ten.trim().split(/\s+/).slice(0, 3)
+    .map(tu => tu.charAt(0).toLocaleUpperCase("vi")).join(" ");
+  const veChuLong = () => {
+    const o = document.createElement("div");
+    o.className = "dau-ten";
+    o.setAttribute("aria-label", "Chữ lồng tên " + C.ten);
+    const s = document.createElement("span");
+    s.textContent = chuLong;
+    o.appendChild(s);
+    khung.replaceWith(o);
+  };
+  if (C.anh) {
+    khung.classList.add("k-" + (C.kieuKhung || "bo-goc"));
+    const img = new Image();
+    img.src = C.anh;
+    img.alt = "Ảnh của " + C.ten;
+    img.onerror = veChuLong;
+    khung.appendChild(img);
+  } else {
+    veChuLong();
+  }
+
+  // địa điểm
+  const noi = document.getElementById("noiChiTiet");
+  noi.innerHTML = "";
+  noi.appendChild(document.createTextNode(C.diaDiem));
+  if (C.diaChi) {
+    const em = document.createElement("em");
+    em.textContent = C.diaChi;
+    noi.appendChild(em);
+  }
+
+  if (C.trangPhuc) dat("trangPhuc", C.trangPhuc);
+  else document.getElementById("hangTrangPhuc").classList.add("an");
+
+  // đường đi
+  const diaChiTim = [C.diaDiem, C.diaChi].filter(Boolean).join(", ");
+  document.getElementById("nutBanDo").href = C.linkBanDo ||
+    ("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(diaChiTim));
+
+  // lưu vào lịch Google
+  const batDau = new Date(C.batDau);
+  const hopLe = !isNaN(batDau.getTime());
+  const nutLich = document.getElementById("nutLich");
+  if (hopLe) {
+    const ketThuc = new Date(batDau.getTime() + (Number(C.soGio) || 2) * 3600000);
+    const utc = d => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    nutLich.href = "https://calendar.google.com/calendar/render?action=TEMPLATE"
+      + "&text=" + encodeURIComponent("Lễ tốt nghiệp của " + C.ten)
+      + "&dates=" + utc(batDau) + "/" + utc(ketThuc)
+      + "&location=" + encodeURIComponent(diaChiTim)
+      + "&details=" + encodeURIComponent(C.ngayGioChu);
+  } else {
+    nutLich.classList.add("an");
+  }
+
+  // chương trình
+  const ct = Array.isArray(C.chuongTrinh) ? C.chuongTrinh : [];
+  if (ct.length) {
+    const o = document.getElementById("chuongTrinh");
+    ct.forEach(m => {
+      const d = document.createElement("div");
+      d.className = "muc";
+      const b = document.createElement("b");
+      b.textContent = m.gio;
+      const s = document.createElement("span");
+      s.textContent = m.viec;
+      d.append(b, s);
+      o.appendChild(d);
+    });
+  } else {
+    document.getElementById("lopChuongTrinh").classList.add("an");
+  }
+
+  // xác nhận tham dự
+  const lopXN = document.getElementById("lopXacNhan");
+  const phieu = document.getElementById("phieu");
+  const nutXN = document.getElementById("nutXacNhan");
+  dat("tuaXacNhan", C.tuaXacNhan || "Bạn sẽ có mặt chứ");
+
+  if (C.linkXacNhan) {
+    // dùng Google Form riêng, ẩn phiếu điền tại trang
+    phieu.classList.add("an");
+    nutXN.classList.remove("an");
+    nutXN.href = C.linkXacNhan;
+  } else if (!C.linkNhanXacNhan && !C.soDienThoai) {
+    // không có chỗ nhận câu trả lời thì ẩn hẳn phần này
+    lopXN.classList.add("an");
+  } else {
+    const dsTraLoi = (Array.isArray(C.nhanTraLoi) && C.nhanTraLoi.length
+      ? C.nhanTraLoi
+      : ["Chắc chắn sẽ đến", "Không đến được, gửi lời chúc"]).slice(0, 4);
+
+    const oChon = document.getElementById("chon");
+    const oTen = document.getElementById("oTen");
+    const nutGui = document.getElementById("nutGui");
+    const oLoi = document.getElementById("loi");
+    const khoiChuc = document.getElementById("khoiChuc");
+    const oChuc = document.getElementById("oChuc");
+    const oGhiChu = document.getElementById("ghiChuChon");
+    const chuNutGoc = nutGui.textContent;
+    const dsGhiChu = Array.isArray(C.ghiChuTraLoi) ? C.ghiChuTraLoi : [];
+    const iKhongDen = (Number(C.oKhongDen) || dsTraLoi.length) - 1;
+    let daChon = -1;
+
+    document.getElementById("nhanChuc").textContent =
+      C.nhanLoiChuc || "Lời chúc bạn muốn gửi";
+    oChuc.placeholder = C.goiYLoiChuc || "";
+
+    // ô lời chúc hiện ra với lựa chọn nào
+    const nenHienChuc = i => {
+      const cach = C.hienLoiChuc || "khong-den";
+      if (cach === "khong") return false;
+      if (cach === "ca-hai") return true;
+      return i === iKhongDen;
+    };
+
+    const cacNut = dsTraLoi.map((chu, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = chu;
+      b.setAttribute("aria-pressed", "false");
+      b.addEventListener("click", () => {
+        daChon = i;
+        cacNut.forEach((x, j) => x.setAttribute("aria-pressed", j === i ? "true" : "false"));
+        oLoi.textContent = "";
+        const ghiChu = (dsGhiChu[i] || "").trim();
+        oGhiChu.textContent = ghiChu;
+        oGhiChu.classList.toggle("an", !ghiChu);
+        const hien = nenHienChuc(i);
+        khoiChuc.classList.toggle("an", !hien);
+        nutGui.textContent = hien ? "Gửi lời chúc" : chuNutGoc;
+      });
+      oChon.appendChild(b);
+      return b;
+    });
+
+    const macDinhCamOn = ["Hẹn gặp lại vào hôm đó nhaaaa!",
+                          "Cảm ơn lời chúc của bạn. Hẹn gặp vào một dịp khác nhé!"];
+    const cauCamOn = i => {
+      const d = C.loiCamOnXacNhan;
+      if (Array.isArray(d)) return d[i] || d[0] || macDinhCamOn[i] || macDinhCamOn[0];
+      if (typeof d === "string" && d.trim()) return d;
+      return macDinhCamOn[i] || macDinhCamOn[0];
+    };
+    const xongRoi = i => {
+      phieu.innerHTML = "";
+      const p = document.createElement("p");
+      p.className = "xong";
+      p.textContent = cauCamOn(i);
+      phieu.appendChild(p);
+    };
+
+    const guiBangTinNhan = (ten, i, loiChuc) => {
+      let chu = "Xác nhận dự lễ tốt nghiệp của " + C.ten + ": " + ten + " "
+        + String(dsTraLoi[i]).toLowerCase() + ".";
+      if (loiChuc) chu += " Lời chúc: " + loiChuc;
+      try {
+        if (navigator.clipboard) navigator.clipboard.writeText(chu);
+      } catch (e) {}
+      if (C.soDienThoai) {
+        const sdt = C.soDienThoai.replace(/\s/g, "");
+        location.href = "sms:" + sdt + "?&body=" + encodeURIComponent(chu);
+      }
+      xongRoi(i);
+    };
+
+    nutGui.addEventListener("click", () => {
+      const ten = oTen.value.trim();
+      if (!ten) {
+        oLoi.textContent = "Mình điền tên giúp em nha  ><";
+        oTen.focus();
+        return;
+      }
+      if (daChon < 0) {
+        oLoi.textContent = "Mình bấm chọn một trong các ô phía trên nhé.";
+        return;
+      }
+      oLoi.textContent = "";
+      nutGui.disabled = true;
+      nutGui.textContent = "Đang gửi...";
+
+      const chonHienTai = daChon;
+      const loiChuc = khoiChuc.classList.contains("an") ? "" : oChuc.value.trim();
+      if (!C.linkNhanXacNhan) {
+        guiBangTinNhan(ten, chonHienTai, loiChuc);
+        return;
+      }
+      const goi = {
+        ten: ten,
+        traLoi: dsTraLoi[daChon],
+        loiChuc: loiChuc,
+        luc: new Date().toLocaleString("vi-VN")
+      };
+      try {
+        fetch(C.linkNhanXacNhan, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams(goi)
+        }).then(() => xongRoi(chonHienTai))
+          .catch(() => guiBangTinNhan(ten, chonHienTai, loiChuc));
+      } catch (e) {
+        guiBangTinNhan(ten, chonHienTai, loiChuc);
+      }
+    });
+  }
+
+  document.getElementById("han").classList.add("an");
+  
+  // ảnh nền đổi theo cuộn
+  const dsNen = Array.isArray(C.anhNen) ? C.anhNen.filter(Boolean) : [];
+  if (dsNen.length) {
+    const goc = document.documentElement.style;
+    if (C.doMoAnhNen) goc.setProperty("--do-mo-nen", String(C.doMoAnhNen));
+    if (C.viTriAnhNen) goc.setProperty("--vi-tri-nen", C.viTriAnhNen);
+
+    const nen = document.createElement("div");
+    nen.id = "nen";
+    nen.setAttribute("aria-hidden", "true");
+    const lopAnh = dsNen.map(tenFile => {
+      const im = new Image();
+      im.src = tenFile;
+      im.alt = "";
+      im.decoding = "async";
+      nen.appendChild(im);
+      return im;
+    });
+    const man = document.createElement("div");
+    man.className = "man";
+    nen.appendChild(man);
+    document.body.prepend(nen);
+
+    let dangO = -1;
+    const doiAnh = i => {
+      if (i === dangO || !lopAnh[i]) return;
+      if (lopAnh[dangO]) lopAnh[dangO].classList.remove("dang-hien");
+      lopAnh[i].classList.add("dang-hien");
+      dangO = i;
+    };
+    doiAnh(0);
+
+    const chang = Array.from(document.querySelectorAll(".lop:not(.an)"));
+    const cuoi = document.querySelector("footer");
+    if (cuoi) chang.push(cuoi);
+
+    if (typeof IntersectionObserver === "function" && chang.length) {
+      const theoDoi = new IntersectionObserver(cacLop => {
+        cacLop.forEach(e => {
+          if (!e.isIntersecting) return;
+          const k = chang.indexOf(e.target);
+          if (k < 0) return;
+          doiAnh(Math.min(lopAnh.length - 1, Math.floor(k * lopAnh.length / chang.length)));
+        });
+      }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 });
+      chang.forEach(s => theoDoi.observe(s));
+    }
+  }
+
+  // vạch gợi ý cuộn, mờ đi ngay khi khách bắt đầu cuộn
+  const cuonGoi = document.getElementById("cuon");
+  if (cuonGoi) {
+    addEventListener("scroll", () => {
+      cuonGoi.classList.toggle("tat", window.scrollY > 60);
+    }, { passive: true });
+  }
+
+  // đếm ngược
+  const oDem = document.getElementById("dem");
+  const lopDem = document.getElementById("lopDem");
+  if (!hopLe) {
+    lopDem.classList.add("an");
+    return;
+  }
+  const coGiay = C.hienGiay !== false;
+  const nhan = [["ngay","Ngày"],["gio","Giờ"],["phut","Phút"]];
+  if (coGiay) nhan.push(["giay","Giây"]);
+  function veDem(){
+    const conLai = batDau.getTime() - Date.now();
+    if (conLai <= 0) {
+      oDem.className = "dem-xong";
+      oDem.textContent = "Hôm nay là ngày ấy. Hẹn gặp bạn.";
+      return;
+    }
+    const tong = Math.floor(conLai / 1000);
+    const so = {
+      ngay: Math.floor(tong / 86400),
+      gio: Math.floor(tong % 86400 / 3600),
+      phut: Math.floor(tong % 3600 / 60),
+      giay: tong % 60
+    };
+    oDem.className = "dem";
+    oDem.innerHTML = "";
+    nhan.forEach(([k, ten]) => {
+      const d = document.createElement("div");
+      const b = document.createElement("b");
+      b.textContent = String(so[k]).padStart(2, "0");
+      const s = document.createElement("small");
+      s.textContent = ten;
+      d.append(b, s);
+      oDem.appendChild(d);
+    });
+  }
+  veDem();
+  setInterval(veDem, coGiay ? 1000 : 30000);
+})();
+</script>
+</body>
+</html>
